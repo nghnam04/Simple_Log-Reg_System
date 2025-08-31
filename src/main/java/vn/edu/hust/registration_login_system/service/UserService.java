@@ -1,6 +1,7 @@
 package vn.edu.hust.registration_login_system.service;
 
 import lombok.AllArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import vn.edu.hust.registration_login_system.constant.RoleEnum;
 import vn.edu.hust.registration_login_system.dto.UserDto;
@@ -19,14 +20,15 @@ import java.util.stream.Collectors;
 public class UserService {
     private UserRepository userRepository;
     private RoleRepository roleRepository;
+    private PasswordEncoder passwordEncoder;
 
     public void saveUser(UserDto userDto){
         User user = new User();
         user.setName(userDto.getFirstName() + " " + userDto.getLastName());
         user.setEmail(userDto.getEmail());
-        user.setPassword(userDto.getPassword());
+        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
 
-        Role role = roleRepository.findByName(RoleEnum.STUDENT);
+        Role role = roleRepository.findByName(RoleEnum.ADMIN);
         if(role == null){
             role = checkRoleExists();
         }
@@ -37,7 +39,7 @@ public class UserService {
 
     public Role checkRoleExists(){
         Role role = new Role();
-        role.setName(RoleEnum.STUDENT);
+        role.setName(RoleEnum.ADMIN);
         return roleRepository.save(role);
     }
 
